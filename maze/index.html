@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<body>
+<script>
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    let scene = 0
+    canvas.width = 400;
+    canvas.height = 400;
+
+    canvas.setAttribute('style','display:block;margin:auto;background-color: #ddd');
+    document.body.appendChild(canvas);
+
+    const ego = {
+        x: null,
+        y: null,
+        width: 30,
+        height: 30,
+
+        update: function(){
+            ctx.fillRect(this.x*40+5, this.y*40+5, this.width, this.height);
+            ctx.fill();
+        }
+    }
+    const block = {
+        width: 40,
+        height: 40,
+        data: [],
+
+        update: function() {
+            this.data.forEach(brick=> {
+                ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+                ctx.fill();
+            })
+        }
+    }
+    const level = [
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,1,0,0,0,0,1],
+        [1,0,1,0,1,0,1,1,1,1],
+        [1,0,1,0,1,0,1,0,0,1],
+        [1,0,1,0,0,0,1,1,0,1],
+        [1,0,1,0,1,0,1,0,0,1],
+        [1,0,1,0,1,0,1,1,0,1],
+        [1,0,1,0,1,0,0,0,0,1],
+        [1,0,1,0,1,0,1,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1],
+    ]
+
+    const init = () => {
+        ego.x = 1;
+        ego.y = 1;
+
+        for(let i=0; i<level.length; i++){
+            for(let j=0; j<level[i].length; j++){
+                if(level[i][j]){
+                    block.data.push({
+                        x: block.width * j,
+                        y: block.height * i,
+                        width: block.width,
+                        height: block.height
+                    })
+                }
+            }
+        }
+    }
+
+    const loop = () => {
+        if (scene === 0) {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+
+            ego.update();
+            block.update();
+
+            if (ego.x === 8 && ego.y === 8) scene = 1;
+            window.requestAnimationFrame(loop);
+        }
+        else if (scene === 1) {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.font = '48px serif';
+            ctx.fillText('Clear!', 10, 50);
+        }
+    }
+
+    init();
+    loop();
+
+    document.addEventListener('keydown', e => {
+        if(e.key === 'ArrowUp' && level[ego.y-1][ego.x] === 0) ego.y -= 1;
+        if(e.key === 'ArrowLeft' && level[ego.y][ego.x-1] === 0) ego.x -=1;
+        if(e.key === 'ArrowRight' && level[ego.y][ego.x+1] === 0) ego.x +=1;
+        if(e.key === 'ArrowDown' && level[ego.y+1][ego.x] === 0) ego.y +=1;
+    });
+    
+</script>
+</body>
+</html>
